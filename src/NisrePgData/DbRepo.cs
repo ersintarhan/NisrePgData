@@ -3,32 +3,17 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using Dapper;
-using Microsoft.Extensions.Logging;
-using NisrePgData;
 using Npgsql;
-using NpgsqlTypes;
 
-namespace CasinoPro.Integration.Database
+namespace NisrePgData
 {
     public class DbRepo
     {
         private readonly string _dbConnectionString;
-        private readonly ILogger<DbRepo> _logger;
-
-        public DbRepo(NpgsqlConnectionStringBuilder csb, ILogger<DbRepo> logger)
+        public DbRepo(NpgsqlConnectionStringBuilder csb)
         {
-            _logger = logger;
             _dbConnectionString = csb.ToString();
         }
-
-        public Task EvolutionBookTransaction(long transactionId)
-        {
-            var p = new PgParam();
-            p.Add("p_transaction_id",transactionId,NpgsqlDbType.Bigint);
-            return this.Execute("evolution.book_transaction", p);
-        }
-
-
         
         #region Private Methods
 
@@ -42,13 +27,12 @@ namespace CasinoPro.Integration.Database
             }
             catch (NpgsqlException ex)
             {
-                var exception = ex.ParseException(_logger, parameter);
+                var exception = new NisreDbException(ex,parameter);
                 throw exception;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Execute Error");
-                throw new Exception("UNKNOWN_ERROR");
+                throw new NisreDbException(e);
             }
         }
 
@@ -62,13 +46,12 @@ namespace CasinoPro.Integration.Database
             }
             catch (NpgsqlException ex)
             {
-                var exception = ex.ParseException(_logger);
+                var exception = new NisreDbException(ex);
                 throw exception;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Execute Error");
-                throw new Exception("System Error");
+                throw new NisreDbException(e);
             }
         }
 
@@ -76,19 +59,18 @@ namespace CasinoPro.Integration.Database
         {
             try
             {
-                await using var db = new NpgsqlConnection(_dbConnectionString);
+                using var db = new NpgsqlConnection(_dbConnectionString);
                 await db.OpenAsync();
                 return await db.QueryAsync<T>(procedure, commandType: CommandType.StoredProcedure);
             }
             catch (NpgsqlException ex)
             {
-                var exception = ex.ParseException(_logger);
+                var exception = new NisreDbException(ex);
                 throw exception;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Query Error");
-                throw new Exception("System Error");
+                throw new NisreDbException(e);
             }
         }
 
@@ -96,19 +78,18 @@ namespace CasinoPro.Integration.Database
         {
             try
             {
-                await using var db = new NpgsqlConnection(_dbConnectionString);
+                using var db = new NpgsqlConnection(_dbConnectionString);
                 await db.OpenAsync();
                 return await db.QueryAsync<T>(procedure, parameter, commandType: CommandType.StoredProcedure);
             }
             catch (NpgsqlException ex)
             {
-                var exception = ex.ParseException(_logger, parameter);
+                var exception = new NisreDbException(ex,parameter);
                 throw exception;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Query Error");
-                throw new Exception("System Error");
+                throw new NisreDbException(e);
             }
         }
 
@@ -116,20 +97,19 @@ namespace CasinoPro.Integration.Database
         {
             try
             {
-                await using var db = new NpgsqlConnection(_dbConnectionString);
+                using var db = new NpgsqlConnection(_dbConnectionString);
                 await db.OpenAsync();
                 return await db.QuerySingleOrDefaultAsync<T>(procedure, parameter,
                     commandType: CommandType.StoredProcedure);
             }
             catch (NpgsqlException ex)
             {
-                var exception = ex.ParseException(_logger, parameter);
+                var exception = new NisreDbException(ex);
                 throw exception;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Query Single Error");
-                throw new Exception("System Error");
+                throw new NisreDbException(e);
             }
         }
 
@@ -137,19 +117,18 @@ namespace CasinoPro.Integration.Database
         {
             try
             {
-                await using var db = new NpgsqlConnection(_dbConnectionString);
+                using var db = new NpgsqlConnection(_dbConnectionString);
                 await db.OpenAsync();
                 return await db.QuerySingleOrDefaultAsync<T>(procedure, commandType: CommandType.StoredProcedure);
             }
             catch (NpgsqlException ex)
             {
-                var exception = ex.ParseException(_logger);
+                var exception = new NisreDbException(ex);
                 throw exception;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Query Single Error");
-                throw new Exception("System Error");
+                throw new NisreDbException(e);
             }
         }
 

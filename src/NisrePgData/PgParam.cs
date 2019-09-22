@@ -10,9 +10,7 @@ namespace NisrePgData
 {
     public class PgParam : SqlMapper.IDynamicParameters
     {
-        private static readonly Dictionary<SqlMapper.Identity, Action<IDbCommand, object>> ParamReaderCache =
-            new Dictionary<SqlMapper.Identity, Action<IDbCommand, object>>();
-
+        private static readonly Dictionary<SqlMapper.Identity, Action<IDbCommand, object>> ParamReaderCache = new Dictionary<SqlMapper.Identity, Action<IDbCommand, object>>();
         private readonly Dictionary<string, ParamInfo> _parameters = new Dictionary<string, ParamInfo>();
         private List<object> _templates;
 
@@ -60,9 +58,7 @@ namespace NisrePgData
         ///     EG: AddDynamicParams(new {A = 1, B = 2}) // will add property A and B to the dynamic
         /// </summary>
         /// <param name="param"></param>
-        public void AddDynamicParams(
-            dynamic param
-        )
+        public void AddDynamicParams(dynamic param)
         {
             if (param is object obj)
             {
@@ -81,8 +77,12 @@ namespace NisrePgData
                 else
                 {
                     if (subDynamic._parameters != null)
+                    {
                         foreach (var kvp in subDynamic._parameters)
+                        {
                             _parameters.Add(kvp.Key, kvp.Value);
+                        }
+                    }
 
                     if (subDynamic._templates != null)
                     {
@@ -101,12 +101,13 @@ namespace NisrePgData
         /// <param name="dbType"></param>
         /// <param name="direction"></param>
         /// <param name="size"></param>
-        public void Add(string name, object value = null, NpgsqlDbType? dbType = null,
-            ParameterDirection? direction = null, int? size = null)
+        public void Add(string name, object value = null, NpgsqlDbType? dbType = null, ParameterDirection? direction = null, int? size = null)
         {
             _parameters[name] = new ParamInfo
             {
-                Name = name, Value = value, ParameterDirection = direction ?? ParameterDirection.Input, DbType = dbType,
+                Name = name, Value = value, 
+                ParameterDirection = direction ?? ParameterDirection.Input, 
+                DbType = dbType,
                 Size = size
             };
         }
