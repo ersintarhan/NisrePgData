@@ -14,7 +14,7 @@ public class Person
 
 
 
-Important for field Mapping for postgresql result set.
+Important field Mapping stuff for postgresql result set.
 
 ```c#
 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
